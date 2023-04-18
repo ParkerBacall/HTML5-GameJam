@@ -18,8 +18,8 @@
 
     var config = {
       type: Phaser.AUTO,
-      width: 800,
-      height: 600,
+      width: 1200,
+      height: 800,
       physics: {
         default: 'arcade',
         arcade: {
@@ -34,22 +34,26 @@
       }
     };
 
-    var game = new Phaser.Game(config);
+    const game = new Phaser.Game(config);
 
-    var time = 0;
-    var gameOver = false
+    let seconds = 0;
+
+    let gameOver = false
 
     function preload() {
-  
+        this.load.image('background', 'assets/background.png');
     }
 
     function create() {
-
+      // World
+      this.add.image(0, 0, 'background').setOrigin(0,0)
+      timeText = this.add.text(16, 16, 'Time: 0', { fontSize: '32px', fill: '#000' });
     }
 
 
     function update() {
-
+        seconds += 1 
+        timeText.setText('Time: ' + (seconds/100).toFixed(1))
     }
 
   </script>
