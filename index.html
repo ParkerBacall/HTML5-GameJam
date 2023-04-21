@@ -2,61 +2,126 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <title>TBD GAME TITLE</title>
-  <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
-  <style type="text/css">
-    body {
-      margin: 0;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <title>TBD GAME TITLE</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
 </head>
 
 <body>
 
-  <script type="text/javascript">
+    <script type="text/javascript">
 
-    var config = {
-      type: Phaser.AUTO,
-      width: 1200,
-      height: 800,
-      physics: {
-        default: 'arcade',
-        arcade: {
-          gravity: { y: 300 },
-          debug: false
+        var config = {
+            type: Phaser.AUTO,
+            width: 1200,
+            height: 800,
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 300 },
+                    debug: false
+                }
+            },
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
+
+        const game = new Phaser.Game(config);
+
+        let seconds = 0;
+
+        let gameOver = false
+
+        function preload() {
+            this.load.image('background', 'assets/background.png');
+            this.load.image('ground', 'assets/platform.png');
+            this.load.spritesheet('character',
+                'assets/character.png',
+                { frameWidth: 60, frameHeight: 74 }
+            );
         }
-      },
-      scene: {
-        preload: preload,
-        create: create,
-        update: update
-      }
-    };
 
-    const game = new Phaser.Game(config);
+        function create() {
 
-    let seconds = 0;
+            // World
+            this.add.image(0, 0, 'background').setOrigin(0, 0)
 
-    let gameOver = false
+            // Ground
+            platforms = this.physics.add.staticGroup();
 
-    function preload() {
-        this.load.image('background', 'assets/background.png');
-    }
+            platforms.create(400, 668, 'ground').setScale(4).refreshBody();
 
-    function create() {
-      // World
-      this.add.image(0, 0, 'background').setOrigin(0,0)
-      timeText = this.add.text(16, 16, 'Time: 0', { fontSize: '32px', fill: '#000' });
-    }
+            // Character
+            this.load.spritesheet('character',
+                'assets/character.png',
+                { frameWidth: 55, frameHeight: 60 }
+            );
+
+            // Player
+            player = this.physics.add.sprite(100, 450, 'character');
+
+            player.setBounce(0.2);
+            player.setCollideWorldBounds(true);
+
+            // Player Anims
+            this.anims.create({
+                key: 'turn',
+                frames: [{ key: 'character', frame: 0 }],
+                frameRate: 20
+            });
+
+            this.anims.create({
+                key: 'right',
+                frames: this.anims.generateFrameNumbers('character', { start: 0, end: 4 }),
+                frameRate: 10,
+                repeat: -1
+            });
+
+            player.body.setGravityY(220)
+            this.physics.add.collider(player, platforms);
+
+            cursors = this.input.keyboard.createCursorKeys();
+
+            // Time Text
+            timeText = this.add.text(16, 16, 'Time: 0', { fontSize: '32px', fill: '#000' });
+        }
 
 
-    function update() {
-        seconds += 1 
-        timeText.setText('Time: ' + (seconds/100).toFixed(1))
-    }
+        function update() {
 
-  </script>
+            // Player Controls
+            // if (cursors.left.isDown) {
+            //     player.setVelocityX(-160);
+
+            //     player.anims.play('left', true);
+            // }
+             if (cursors.right.isDown) {
+                player.setVelocityX(160);
+                player.anims.play('right', true);
+            }
+            else {
+                player.setVelocityX(0);
+                player.anims.play('turn');
+            }
+
+            if (cursors.space.isDown && player.body.touching.down) {
+                player.setVelocityY(-530);
+            }
+
+            // Time Update
+            seconds += 1
+            timeText.setText('Time: ' + (seconds / 100).toFixed(1))
+        }
+
+    </script>
 
 </body>
 
