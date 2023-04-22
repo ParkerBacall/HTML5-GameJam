@@ -36,6 +36,7 @@
         const game = new Phaser.Game(config);
 
         let seconds = 1500;
+        let score = 0;
         let gameOver = false;
         let player = null;
         let stars = [];
@@ -95,6 +96,10 @@
 
             // Time Text
             timeText = this.add.text(16, 16, 'Time: 60', { fontSize: '32px', fill: '#000' });
+
+
+            // Score Text
+            scoreText = this.add.text(16, 56, 'Score: 0', { fontSize: '16px', fill: '#000' });
         }
 
         function update() {
@@ -106,10 +111,15 @@
                 }
             }
 
-            // Time Update
             if (!gameOver) {
                 seconds -= 1
+                score += 2
+
+                // Time Update
                 timeText.setText('Time: ' + (seconds / 100).toFixed(1))
+
+                // Score Update
+                scoreText.setText('Score: ' + (score / 100).toFixed(0))
             }
 
             //  Timeout
