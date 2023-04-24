@@ -1,10 +1,9 @@
-import Phaser from 'phaser'
+import BaseScene from "./BaseScene";
 
-class PlayScene extends Phaser.Scene {
+class PlayScene extends BaseScene {
 
     constructor(config) {
-        super('PlayScene');
-        this.config = config;
+        super('PlayScene', config);
 
         this.player = null;
         this.platforms = null
@@ -19,18 +18,12 @@ class PlayScene extends Phaser.Scene {
         this.scoreText = null;
         this.gameOverText = null;
         this.gravity = 450;
-    }
-
-    preload() {
-        this.loadBackground()
-        this.loadPlatform()
-        this.loadCharacter()
-        this.loadHearts()
-        this.loadTentacles()
+        this.track = null
+        this.isPlaying = false
     }
 
     create() {
-        this.createBackground()
+        super.create()
         this.createPlatform()
         this.createPlayer()
         this.generateHearts(this)
@@ -41,10 +34,12 @@ class PlayScene extends Phaser.Scene {
         this.createInputs()
         this.createTimeText()
         this.createScoreText()
+        this.setGameOver()
+        // this.playSoundtrack()
+        this.createPause()
     }
 
     update() {
-
         this.checkTimeout()
 
         if (!this.gameOver) {
@@ -57,32 +52,6 @@ class PlayScene extends Phaser.Scene {
 
         this.updateHearts()
         this.updateTentacles()
-    }
-
-    loadBackground() {
-        this.load.image('background', 'assets/background.png');
-    }
-
-    loadPlatform() {
-        this.load.image('platform', 'assets/platform.png');
-    }
-
-    loadCharacter() {
-        this.load.spritesheet('character',
-            'assets/character.png',
-            { frameWidth: 60, frameHeight: 74 }
-        );
-    }
-
-    loadHearts() {
-        this.load.spritesheet('hearts', 'assets/hearts.png',
-            { frameWidth: 50, frameHeight: 50 });
-    }
-
-    loadTentacles() {
-        this.load.spritesheet('tentacle', 'assets/tentacle.png',
-            { frameWidth: 39, frameHeight: 240 },
-        )
     }
 
     createBackground() {
@@ -115,6 +84,18 @@ class PlayScene extends Phaser.Scene {
             frameRate: 10,
             repeat: -1
         });
+    }
+
+    createPause() {
+        const pauseButton = this.add.image(this.config.width - 20, 60, 'pause')
+            .setScale(3)
+            .setOrigin(1)
+            .setInteractive();
+
+        pauseButton.on('pointerdown', () => {
+            this.physics.pause();
+            this.scene.pause();
+        })
     }
 
     generateHearts() {
@@ -181,11 +162,27 @@ class PlayScene extends Phaser.Scene {
     }
 
     createTimeText() {
+        this.seconds = 750;
         this.timeText = this.add.text(16, 16, 'Time: 10', { fontSize: '32px', fill: '#000' });
     }
 
     createScoreText() {
+        this.score = 0;
+        const bestScore = localStorage.getItem('bestScore')
         this.scoreText = this.add.text(16, 56, 'Score: 0', { fontSize: '16px', fill: '#000' });
+        this.add.text(16, 76, `Best Score: ${bestScore || 0}`, { fontSize: '14px', fill: '#000' });
+    }
+
+    setGameOver() {
+        this.gameOver = false;
+    }
+
+    playSoundtrack() {
+        this.track = this.sound.add('triumph')
+        if (!this.isPlaying) {
+            this.track.play()
+        }
+        this.isPlaying = true
     }
 
     jump() {
@@ -217,6 +214,16 @@ class PlayScene extends Phaser.Scene {
         this.player.anims.play('die');
         this.gameOverText = this.add.text(420, 300, 'GAME OVER', { fontSize: '64px', fill: '#FF0000' })
         this.physics.pause();
+
+        this.setBestScore()
+
+        this.time.addEvent({
+            delay: 1000,
+            callback: () => {
+                this.scene.restart();
+            },
+            loop: false
+        })
     }
 
     updateHearts() {
@@ -273,6 +280,16 @@ class PlayScene extends Phaser.Scene {
         if (this.tentacles.countActive(true) === 0) {
             this.generateTentacles(this)
         }
+    }
+
+    setBestScore() {
+        const bestScoreText = localStorage.getItem('bestScore')
+        const bestScore = bestScoreText && parseInt(bestScoreText)
+
+        if (!bestScore || (this.score / 100).toFixed(0) > bestScore) {
+            localStorage.setItem('bestScore', (this.score / 100).toFixed(0))
+        }
+
     }
 
 }
