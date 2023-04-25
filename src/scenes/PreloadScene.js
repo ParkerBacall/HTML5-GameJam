@@ -15,6 +15,7 @@ class PreloadScene extends Phaser.Scene {
         this.loadTentacles()
         this.loadSoundtrack()
         this.loadPause()
+        this.loadBackButton()
     }
 
     create() {
@@ -60,6 +61,9 @@ class PreloadScene extends Phaser.Scene {
         this.load.image('pause', 'assets/pause.png')
     }
 
+    loadBackButton() {
+        this.load.image('back', 'assets/back.png')
+    }
 
 
 }

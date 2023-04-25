@@ -20,6 +20,21 @@ class PlayScene extends BaseScene {
         this.gravity = 450;
         this.track = null
         this.isPlaying = false
+        this.currentDifficulty = 'easy'
+        this.difficulties = {
+            'easy': {
+                speed: -360
+            },
+            'normal': {
+                speed: -460
+            },
+            'hard': {
+                speed: -560
+            },
+            'extraHard': {
+                speed: -660
+            }
+        }
     }
 
     create() {
@@ -35,8 +50,9 @@ class PlayScene extends BaseScene {
         this.createTimeText()
         this.createScoreText()
         this.setGameOver()
-        // this.playSoundtrack()
+        this.playSoundtrack()
         this.createPause()
+        this.listenForEvents()
     }
 
     update() {
@@ -52,6 +68,13 @@ class PlayScene extends BaseScene {
 
         this.updateHearts()
         this.updateTentacles()
+    }
+
+
+    listenForEvents() {
+        this.events.on('resume', () => {
+            this.physics.resume()
+        })
     }
 
     createBackground() {
@@ -88,17 +111,19 @@ class PlayScene extends BaseScene {
 
     createPause() {
         const pauseButton = this.add.image(this.config.width - 20, 60, 'pause')
-            .setScale(3)
             .setOrigin(1)
             .setInteractive();
 
         pauseButton.on('pointerdown', () => {
             this.physics.pause();
             this.scene.pause();
+            this.scene.launch('PauseScene')
+            this.track.pause();
         })
     }
 
     generateHearts() {
+        const difficulty = this.difficulties[this.currentDifficulty]
         this.hearts = this.physics.add.group({
             key: 'heart',
             repeat: 1,
@@ -106,7 +131,7 @@ class PlayScene extends BaseScene {
         });
 
         this.hearts.children.iterate(function (child) {
-            child.body.velocity.x = -360
+            child.body.velocity.x = difficulty.speed
             child.setBodySize(40, 40)
         });
 
@@ -128,6 +153,10 @@ class PlayScene extends BaseScene {
     }
 
     generateTentacles() {
+        const difficulty = this.difficulties[this.currentDifficulty]
+
+        console.log(difficulty.speed)
+
         this.tentacles = this.physics.add.group({
             key: 'tentacle',
             repeat: 1,
@@ -135,7 +164,7 @@ class PlayScene extends BaseScene {
         });
 
         this.tentacles.children.iterate(function (child) {
-            child.body.velocity.x = -360
+            child.body.velocity.x = difficulty.speed
         });
 
         this.physics.add.overlap(this.player, this.tentacles, this.hitTentacle, null, this);
@@ -200,6 +229,25 @@ class PlayScene extends BaseScene {
     updateScore() {
         this.score += 2
         this.scoreText.setText('Score: ' + (this.score / 100).toFixed(0))
+
+        this.increaseDifficulty()
+    }
+
+    increaseDifficulty() {
+        switch (this.score) {
+            case 1000:
+                console.log('normal')
+                this.difficulty = 'normal'
+                break
+            case 2000:
+                console.log('hard')
+                this.difficulty = 'hard'
+                break
+            case 4000:
+                console.log('extraHard')
+                this.difficulty = 'extraHard'
+                break
+        }
     }
 
     checkTimeout() {
@@ -269,6 +317,7 @@ class PlayScene extends BaseScene {
 
                 case 7:
                     child.setBodySize(40, 230)
+                    break;
 
             }
 
