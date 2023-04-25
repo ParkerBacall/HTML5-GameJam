@@ -18,8 +18,11 @@ class PlayScene extends BaseScene {
         this.scoreText = null;
         this.gameOverText = null;
         this.gravity = 450;
-        this.track = null
-        this.isPlaying = false
+        this.soundtrack = null;
+        this.jumpSound = null;
+        this.heartSound = null;
+        this.tentacleSound = null;
+        this.dieSound = null;
         this.currentDifficulty = 'easy'
         this.difficulties = {
             'easy': {
@@ -50,9 +53,14 @@ class PlayScene extends BaseScene {
         this.createTimeText()
         this.createScoreText()
         this.setGameOver()
+        this.createSoundtrack()
         this.playSoundtrack()
         this.createPause()
         this.listenForEvents()
+        this.createJumpSound()
+        this.createHeartSound()
+        this.createDieSound()
+        this.createTentacleSound()
     }
 
     update() {
@@ -74,6 +82,7 @@ class PlayScene extends BaseScene {
     listenForEvents() {
         this.events.on('resume', () => {
             this.physics.resume()
+            this.soundtrack.resume()
         })
     }
 
@@ -81,13 +90,20 @@ class PlayScene extends BaseScene {
         this.add.image(0, 0, 'background').setOrigin(0, 0);
     }
 
+    createSoundtrack() {
+        if (!this.config.isSoundtrackCreated || this.config.isSoundtrackCreated === false) {
+            this.soundtrack = this.sound.add('triumph');
+            this.config.isSoundtrackCreated = true;
+        }
+    }
+
     createPlatform() {
         this.platforms = this.physics.add.staticGroup();
-        this.platforms.create(600, 590, 'platform');
+        this.platforms.create(600, this.config.height - 10, 'platform');
     }
 
     createPlayer() {
-        this.player = this.physics.add.sprite(100, 520, 'character');
+        this.player = this.physics.add.sprite(100, this.config.height - 60, 'character');
         this.player.setBounce(0.2);
         this.player.body.setGravityY(this.gravity);
         this.physics.add.collider(this.player, this.platforms);
@@ -118,8 +134,24 @@ class PlayScene extends BaseScene {
             this.physics.pause();
             this.scene.pause();
             this.scene.launch('PauseScene')
-            this.track.pause();
+            this.soundtrack.pause();
         })
+    }
+
+    createJumpSound() {
+        this.jumpSound = this.sound.add('jump');
+    }
+
+    createTentacleSound() {
+        this.tentacleSound = this.sound.add('tentacleSound');
+    }
+
+    createHeartSound() {
+        this.heartSound = this.sound.add('heartSound');
+    }
+
+    createDieSound() {
+        this.dieSound = this.sound.add('die');
     }
 
     generateHearts() {
@@ -127,7 +159,7 @@ class PlayScene extends BaseScene {
         this.hearts = this.physics.add.group({
             key: 'heart',
             repeat: 1,
-            setXY: { x: 1700, y: 542, stepX: 800 }
+            setXY: { x: 1700, y: this.config.height - 45, stepX: 800 }
         });
 
         this.hearts.children.iterate(function (child) {
@@ -141,6 +173,7 @@ class PlayScene extends BaseScene {
     collectHeart(player, heart) {
         heart.disableBody(true, true);
         this.seconds += 250
+        this.heartSound.play()
     }
 
     createHeartAnimations() {
@@ -155,12 +188,10 @@ class PlayScene extends BaseScene {
     generateTentacles() {
         const difficulty = this.difficulties[this.currentDifficulty]
 
-        console.log(difficulty.speed)
-
         this.tentacles = this.physics.add.group({
             key: 'tentacle',
             repeat: 1,
-            setXY: { x: 1300, y: 590, stepX: 800 }
+            setXY: { x: 1300, y: this.config.height - 10, stepX: 800 }
         });
 
         this.tentacles.children.iterate(function (child) {
@@ -171,6 +202,7 @@ class PlayScene extends BaseScene {
     }
 
     hitTentacle(player, tentacle) {
+        this.tentacleSound.play()
         tentacle.disableBody(true, true);
         this.seconds -= 250
         player.setVelocityY(-550)
@@ -207,17 +239,17 @@ class PlayScene extends BaseScene {
     }
 
     playSoundtrack() {
-        this.track = this.sound.add('triumph')
-        if (!this.isPlaying) {
-            this.track.play()
+        if (!this.config.isSoundtrackPlaying || this.config.isSoundtrackPlaying === false) {
+            this.soundtrack.play()
+            this.config.isSoundtrackPlaying = true
         }
-        this.isPlaying = true
     }
 
     jump() {
         this.player.anims.play('right', true);
         if (this.cursors.space.isDown && this.player.body.touching.down) {
             this.player.setVelocityY(-330);
+            this.jumpSound.play()
         }
     }
 
@@ -236,15 +268,12 @@ class PlayScene extends BaseScene {
     increaseDifficulty() {
         switch (this.score) {
             case 1000:
-                console.log('normal')
                 this.difficulty = 'normal'
                 break
             case 2000:
-                console.log('hard')
                 this.difficulty = 'hard'
                 break
             case 4000:
-                console.log('extraHard')
                 this.difficulty = 'extraHard'
                 break
         }
@@ -257,6 +286,7 @@ class PlayScene extends BaseScene {
     }
 
     checkGameOver() {
+        this.dieSound.play()
         this.timeText.setText('Time: 0')
         this.player.setTint(0xff0000);
         this.player.anims.play('die');
@@ -266,7 +296,7 @@ class PlayScene extends BaseScene {
         this.setBestScore()
 
         this.time.addEvent({
-            delay: 1000,
+            delay: 3000,
             callback: () => {
                 this.scene.restart();
             },

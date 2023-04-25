@@ -5,17 +5,22 @@ import MenuScene from "./scenes/MenuScene";
 import PreloadScene from "./scenes/PreloadScene";
 import ScoreScene from "./scenes/ScoreScene";
 import PauseScene from "./scenes/PauseScene";
+import InstructionScene from "./scenes/InstructionScene";
 
 
 const Width = 1200
-const Height = 600
+const Height = 550
 
 const SharedConfig = {
     width: Width,
     height: Height,
+    isSoundtrackCreated: false,
+    isSoundtrackPlaying: false,
+
+
 }
 
-const Scenes = [PreloadScene, MenuScene, PlayScene, ScoreScene, PauseScene]
+const Scenes = [PreloadScene, MenuScene, PlayScene, ScoreScene, PauseScene, InstructionScene]
 const createScene = Scene => new Scene(SharedConfig)
 const initScenes =  () => Scenes.map(createScene)
 
