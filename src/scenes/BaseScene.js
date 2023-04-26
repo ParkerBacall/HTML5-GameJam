@@ -6,10 +6,13 @@ class BaseScene extends Phaser.Scene {
         super(key);
         this.config = config;
         this.screenCenter = [config.width / 2, config.height / 2]
+        this.menuSound = null
+        this.menuSong = null
     }
 
     create() {
         this.createBackground()
+        this.createMenuSound()
 
         if (this.config.hasBackButton) {
             const backButton = this.add.image(10, 10, 'back').setOrigin(0)
@@ -17,6 +20,7 @@ class BaseScene extends Phaser.Scene {
 
             backButton.on('pointerup', () => {
                 this.scene.start('MenuScene')
+                this.playMenuSound()
             })
         }
     }
@@ -24,6 +28,11 @@ class BaseScene extends Phaser.Scene {
     createBackground() {
         this.add.image(0, 0, 'background').setOrigin(0, 0);
     }
+
+    createMenuSound() {
+        this.menuSound = this.sound.add('jump');
+    }
+
 
     createMenu(menu, lineHeight, yPosition, fontSize) {
         let lastMenuPositionY = 0;
@@ -36,6 +45,10 @@ class BaseScene extends Phaser.Scene {
                 this.setUpMenuEvents(menuItem)
             }
         })
+    }
+
+    playMenuSound() {
+        this.menuSound.play()
     }
 
 

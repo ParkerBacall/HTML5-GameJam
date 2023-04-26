@@ -5,20 +5,33 @@ class MenuScene extends BaseScene {
     constructor(config) {
         super('MenuScene', config);
         this.lineHeight = 42;
-        this.yPosition = this.screenCenter[1]
+        this.yPosition = this.screenCenter[1] + 140
         this.fontSize = 32;
-            this.menu = [
-                { scene: 'PlayScene', text: 'Play' },
-                { scene: 'ScoreScene', text: 'Best Score' },
-                { scene: 'InstructionScene', text: 'Instructions' },
-                { scene: 'null', text: 'Exit' }
-            ]
+        this.menu = [
+            { scene: 'PlayScene', text: 'Play' },
+            { scene: 'ScoreScene', text: 'Best Score' },
+            { scene: 'InstructionScene', text: 'Instructions' },
+        ]
     }
 
     create() {
         super.create()
+        this.createTitle()
         this.createMenu(this.menu, this.lineHeight, this.yPosition, this.fontSize, (menuItem) => this.setUpMenuEvents(menuItem))
         this.createCredits()
+        this.playMenuSong()
+    }
+
+    createTitle() {
+        this.add.image(this.screenCenter[0], 470, 'title').setScale(0.3).setOrigin(0.5, 1)
+    }
+
+    playMenuSong() {
+        if (!this.config.menuSongPlaying) {
+            this.menuSong = this.sound.add('menuSong')
+            this.menuSong.play()
+            this.config.menuSongPlaying = true
+        }
     }
 
     setUpMenuEvents(menuItem) {
@@ -32,6 +45,15 @@ class MenuScene extends BaseScene {
         })
         textGO.on('pointerup', () => {
             menuItem.scene && this.scene.start(menuItem.scene);
+
+            if (menuItem.text === 'Play') {
+                this.menuSong.pause()
+                this.config.menuSongPlaying = false
+            }
+
+            if (menuItem.text !== 'Play') {
+                this.playMenuSound()
+            }
 
             if (menuItem.text === 'Exit') {
                 this.game.destroy(true);

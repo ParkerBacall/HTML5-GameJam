@@ -20,10 +20,20 @@ class PreloadScene extends Phaser.Scene {
         this.loadHeartSound()
         this.loadDieSound()
         this.loadTentacleSound()
+        this.loadTitle()
+        this.loadMenuSong()
     }
 
     create() {
-        this.scene.start("MenuScene")  
+        this.scene.start("MenuScene")
+    }
+
+    loadTitle() {
+        this.load.image('title', 'assets/title.png');
+    }
+
+    loadMenuSong() {
+        this.load.audio('menuSong', 'assets/menu.wav');
     }
 
     loadBackground() {
@@ -40,6 +50,11 @@ class PreloadScene extends Phaser.Scene {
 
     loadHeartSound() {
         this.load.audio('heartSound', 'assets/heart.wav')
+    }
+
+    loadBackButtonActive() {
+        this.load.image('backActive', 'assets/backGreen.png');
+
     }
 
     loadTentacleSound() {

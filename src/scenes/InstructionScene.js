@@ -14,13 +14,13 @@ class InstructionScene extends BaseScene {
             { scene: 'null', text: 'Collect hearts to increase time limit' },
             { scene: 'null', text: 'Running into tentacles will decrease time limit' },
             { scene: 'null', text: 'Difficulty increases as time goes on' },
-            { scene: 'null', text: 'Reach a score of 100 for a special prize ;)' },
+            { scene: 'null', text: 'Reach a score of 100 for a special prize on score page ;)' },
         ]
     }
 
     create() {
         super.create()
-        this.createMenu(this.menu, this.lineHeight, this.yPositon, this.fontSize, () => null )
+        this.createMenu(this.menu, this.lineHeight, this.yPositon, this.fontSize, () => null)
 
     }
 

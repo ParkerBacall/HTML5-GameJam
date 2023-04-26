@@ -4,7 +4,6 @@ class PlayScene extends BaseScene {
 
     constructor(config) {
         super('PlayScene', config);
-
         this.player = null;
         this.platforms = null
         this.seconds = 750;
@@ -23,21 +22,6 @@ class PlayScene extends BaseScene {
         this.heartSound = null;
         this.tentacleSound = null;
         this.dieSound = null;
-        this.currentDifficulty = 'easy'
-        this.difficulties = {
-            'easy': {
-                speed: -360
-            },
-            'normal': {
-                speed: -460
-            },
-            'hard': {
-                speed: -560
-            },
-            'extraHard': {
-                speed: -660
-            }
-        }
     }
 
     create() {
@@ -76,6 +60,14 @@ class PlayScene extends BaseScene {
 
         this.updateHearts()
         this.updateTentacles()
+
+        this.hearts.children.entries.forEach(heart => {
+            heart.body.velocity.x = this.config.difficulties[this.config.difficulty].speed
+        })
+
+        this.tentacles.children.entries.forEach(tentacle => {
+            tentacle.body.velocity.x = this.config.difficulties[this.config.difficulty].speed
+        })
     }
 
 
@@ -104,7 +96,7 @@ class PlayScene extends BaseScene {
 
     createPlayer() {
         this.player = this.physics.add.sprite(100, this.config.height - 60, 'character');
-        this.player.setBounce(0.2);
+        // this.player.setBounce(0.2);
         this.player.body.setGravityY(this.gravity);
         this.physics.add.collider(this.player, this.platforms);
     }
@@ -155,19 +147,19 @@ class PlayScene extends BaseScene {
     }
 
     generateHearts() {
-        const difficulty = this.difficulties[this.currentDifficulty]
         this.hearts = this.physics.add.group({
             key: 'heart',
             repeat: 1,
-            setXY: { x: 1700, y: this.config.height - 45, stepX: 800 }
-        });
-
-        this.hearts.children.iterate(function (child) {
-            child.body.velocity.x = difficulty.speed
-            child.setBodySize(40, 40)
+            setXY: { x: 1700, y: this.config.height - 45, stepX: 800 },
         });
 
         this.physics.add.overlap(this.player, this.hearts, this.collectHeart, null, this);
+    }
+
+    getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
     }
 
     collectHeart(player, heart) {
@@ -186,26 +178,23 @@ class PlayScene extends BaseScene {
     }
 
     generateTentacles() {
-        const difficulty = this.difficulties[this.currentDifficulty]
-
         this.tentacles = this.physics.add.group({
             key: 'tentacle',
             repeat: 1,
-            setXY: { x: 1300, y: this.config.height - 10, stepX: 800 }
-        });
-
-        this.tentacles.children.iterate(function (child) {
-            child.body.velocity.x = difficulty.speed
+            setXY: { x: 1300, y: this.config.height - 10, stepX: 800 },
         });
 
         this.physics.add.overlap(this.player, this.tentacles, this.hitTentacle, null, this);
     }
 
     hitTentacle(player, tentacle) {
-        this.tentacleSound.play()
         tentacle.disableBody(true, true);
         this.seconds -= 250
-        player.setVelocityY(-550)
+        if (this.seconds > 0) {
+            this.tentacleSound.play()
+            player.setVelocityY(-550)
+
+        }
     }
 
     createTentacleAnimations() {
@@ -232,6 +221,9 @@ class PlayScene extends BaseScene {
         const bestScore = localStorage.getItem('bestScore')
         this.scoreText = this.add.text(16, 56, 'Score: 0', { fontSize: '16px', fill: '#000' });
         this.add.text(16, 76, `Best Score: ${bestScore || 0}`, { fontSize: '14px', fill: '#000' });
+        if (parseInt(bestScore) > 100){
+            this.add.text(16, 96, 'Check score page!', { fontSize: '14px', fill: '#6ae034' });
+        }
     }
 
     setGameOver() {
@@ -261,22 +253,20 @@ class PlayScene extends BaseScene {
     updateScore() {
         this.score += 2
         this.scoreText.setText('Score: ' + (this.score / 100).toFixed(0))
-
         this.increaseDifficulty()
     }
 
     increaseDifficulty() {
-        switch (this.score) {
-            case 1000:
-                this.difficulty = 'normal'
-                break
-            case 2000:
-                this.difficulty = 'hard'
-                break
-            case 4000:
-                this.difficulty = 'extraHard'
-                break
+        if (this.score > 1500 && this.score < 3000) {
+            this.config.difficulty = 'normal'
+        } else if (this.score > 3001 && this.score < 5000) {
+            this.config.difficulty = 'hard'
+        } else if (this.score > 5001) {
+            this.config.difficulty = 'extraHard'
+        } else {
+            this.config.difficulty = 'easy'
         }
+
     }
 
     checkTimeout() {
@@ -296,8 +286,9 @@ class PlayScene extends BaseScene {
         this.setBestScore()
 
         this.time.addEvent({
-            delay: 3000,
+            delay: 1000,
             callback: () => {
+                this.dieSound.stop()
                 this.scene.restart();
             },
             loop: false

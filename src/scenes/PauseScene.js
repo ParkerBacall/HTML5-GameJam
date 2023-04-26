@@ -29,7 +29,7 @@ class PauseScene extends BaseScene {
             textGO.setStyle({ fill: '#000' });
         })
         textGO.on('pointerup', () => {
-            if (menuItem.scene && menuItem.text === 'Continue' ) {
+            if (menuItem.scene && menuItem.text === 'Continue') {
                 this.scene.stop();
                 this.scene.resume(menuItem.scene);
             } else {
@@ -37,7 +37,7 @@ class PauseScene extends BaseScene {
                 this.scene.start(menuItem.scene)
                 this.config.isSoundtrackCreated = false;
                 this.config.isSoundtrackPlaying = false;
-
+                this.playMenuSound()
             }
         })
     }
