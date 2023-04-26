@@ -1,7 +1,6 @@
 # Tentacle Triumph!
 
-![title](https://user-images.githubusercontent.com/17993120/234438560-129e01da-981d-4339-a289-885048c84292.png)
-
+<img width="832" alt="GamePhoto" src="https://user-images.githubusercontent.com/17993120/234438768-5b12988a-ff5e-4020-ade7-483103efda88.png">
 
 My first game :) 
 Made using phaser 3 https://phaser.io/​
