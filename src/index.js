@@ -7,8 +7,8 @@ import ScoreScene from "./scenes/ScoreScene";
 import PauseScene from "./scenes/PauseScene";
 import InstructionScene from "./scenes/InstructionScene";
 
-
-const Width = 1200
+const screenSize = window.matchMedia("(max-width: 700px)")
+const Width = screenSize.matches ? 350 : 1200;
 const Height = 550
 
 const SharedConfig = {

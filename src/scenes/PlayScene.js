@@ -243,6 +243,12 @@ class PlayScene extends BaseScene {
             this.player.setVelocityY(-330);
             this.jumpSound.play()
         }
+               this.input.on('pointerdown', () => {
+            if (this.player.body.touching.down) {
+                this.player.setVelocityY(-330);
+                this.jumpSound.play()
+            }
+        })
     }
 
     updateTime() {
