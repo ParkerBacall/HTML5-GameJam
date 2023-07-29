@@ -221,7 +221,7 @@ class PlayScene extends BaseScene {
         const bestScore = localStorage.getItem('bestScore')
         this.scoreText = this.add.text(16, 56, 'Score: 0', { fontSize: '16px', fill: '#000' });
         this.add.text(16, 76, `Best Score: ${bestScore || 0}`, { fontSize: '14px', fill: '#000' });
-        if (parseInt(bestScore) > 100){
+        if (parseInt(bestScore) > 100) {
             this.add.text(16, 96, 'Check score page!', { fontSize: '14px', fill: '#6ae034' });
         }
     }
@@ -243,7 +243,7 @@ class PlayScene extends BaseScene {
             this.player.setVelocityY(-330);
             this.jumpSound.play()
         }
-               this.input.on('pointerdown', () => {
+        this.input.on('pointerdown', () => {
             if (this.player.body.touching.down) {
                 this.player.setVelocityY(-330);
                 this.jumpSound.play()
