@@ -84,7 +84,7 @@ class PlayScene extends BaseScene {
 
     createSoundtrack() {
         if (!this.config.isSoundtrackCreated || this.config.isSoundtrackCreated === false) {
-            this.soundtrack = this.sound.add('triumph');
+            this.soundtrack = this.sound.add('triumph', 1, true);
             this.config.isSoundtrackCreated = true;
         }
     }
@@ -243,6 +243,12 @@ class PlayScene extends BaseScene {
             this.player.setVelocityY(-330);
             this.jumpSound.play()
         }
+        this.input.on('pointerdown', () => {
+            if (this.player.body.touching.down) {
+                this.player.setVelocityY(-330);
+                this.jumpSound.play()
+            }
+        })
     }
 
     updateTime() {
