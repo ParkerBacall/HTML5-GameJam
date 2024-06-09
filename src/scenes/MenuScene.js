@@ -28,7 +28,7 @@ class MenuScene extends BaseScene {
 
     playMenuSong() {
         if (!this.config.menuSongPlaying) {
-            this.menuSong = this.sound.add('menuSong')
+            this.menuSong = this.sound.add('menuSong', { volume: 0.1, loop: true })
             this.menuSong.play()
             this.config.menuSongPlaying = true
         }

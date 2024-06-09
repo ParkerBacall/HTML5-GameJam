@@ -30,7 +30,7 @@ class BaseScene extends Phaser.Scene {
     }
 
     createMenuSound() {
-        this.menuSound = this.sound.add('jump');
+        this.menuSound = this.sound.add('jump', { volume: 0.1, loop: false });
     }
 
 

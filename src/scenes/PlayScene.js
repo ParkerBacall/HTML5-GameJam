@@ -84,7 +84,7 @@ class PlayScene extends BaseScene {
 
     createSoundtrack() {
         if (!this.config.isSoundtrackCreated || this.config.isSoundtrackCreated === false) {
-            this.soundtrack = this.sound.add('triumph');
+            this.soundtrack = this.sound.add('triumph', { volume: 0.05, loop: true });
             this.config.isSoundtrackCreated = true;
         }
     }
@@ -131,19 +131,19 @@ class PlayScene extends BaseScene {
     }
 
     createJumpSound() {
-        this.jumpSound = this.sound.add('jump');
+        this.jumpSound = this.sound.add('jump', { volume: 0.1, loop: false });
     }
 
     createTentacleSound() {
-        this.tentacleSound = this.sound.add('tentacleSound');
+        this.tentacleSound = this.sound.add('tentacleSound', { volume: 0.1, loop: false });
     }
 
     createHeartSound() {
-        this.heartSound = this.sound.add('heartSound');
+        this.heartSound = this.sound.add('heartSound', { volume: 0.1, loop: false });
     }
 
     createDieSound() {
-        this.dieSound = this.sound.add('die');
+        this.dieSound = this.sound.add('die', { volume: 0.1, loop: false });
     }
 
     generateHearts() {
