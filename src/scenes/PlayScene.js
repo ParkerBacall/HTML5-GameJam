@@ -282,19 +282,20 @@ class PlayScene extends BaseScene {
     }
 
     checkGameOver() {
-        this.dieSound.play()
         this.timeText.setText('Time: 0')
         this.player.setTint(0xff0000);
         this.player.anims.play('die');
         this.gameOverText = this.add.text(420, 300, 'GAME OVER', { fontSize: '64px', fill: '#FF0000' })
         this.physics.pause();
+        if (!this.dieSound.isPlaying){
+            this.dieSound.play()
+        }
 
         this.setBestScore()
 
         this.time.addEvent({
-            delay: 1000,
+            delay: 700,
             callback: () => {
-                this.dieSound.stop()
                 this.scene.restart();
             },
             loop: false
